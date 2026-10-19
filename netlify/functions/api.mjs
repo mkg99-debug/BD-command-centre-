@@ -1,5 +1,6 @@
 import { getStore } from "@netlify/blobs";
 import { refreshStalest, baseName } from "./news.mjs";
+import { sendDigest, buildDigest } from "./digest-lib.mjs";
 import companies from "./companies.mjs";
 
 const json = (o, status = 200) =>
@@ -23,6 +24,15 @@ export default async (req, context) => {
 
   if (op === "news" && req.method === "GET") {
     return json({ news: (await store.get("news", { type: "json" })) || {} });
+  }
+
+  if (op === "digest" && req.method === "POST") {
+    try { return json({ ok: true, ...(await sendDigest(24)) }); }
+    catch (e) { return json({ error: e.message }, 400); }
+  }
+  if (op === "digest-preview" && req.method === "GET") {
+    const d = await buildDigest(24);
+    return new Response(d.html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } });
   }
 
   if (op === "refresh" && req.method === "POST") {

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Salt BD Command Centre</title>
+<title>Salt BD · SA SMEs</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -105,9 +105,10 @@ aside .panel+.panel{margin-top:12px;position:static}
 </head>
 <body>
 <header><div class="hwrap">
-  <div><h1>Salt BD Command Centre <span>· SA</span></h1><div class="sub" id="modeLine"></div></div>
+  <div><h1>Salt BD Command Centre <span>· SA SMEs</span></h1><div class="sub" id="modeLine"></div></div>
   <div class="hbtns">
     <button id="exportBtn">Export BD list</button>
+    <button id="digestBtn" class="hidden">Email me the digest</button>
     <button id="backupBtn">Back up my updates</button>
     <button id="restoreBtn">Restore a backup</button>
     <button id="themeBtn" aria-label="Toggle theme">◐</button>
@@ -203,6 +204,10 @@ $("#lgBtn").onclick = async ()=>{
   catch(e){ $("#lgErr").textContent = e.message==="auth" ? "That password isn't right." : "Couldn't reach the server: "+e.message; }
 };
 $("#lgPw").addEventListener("keydown",e=>{if(e.key==="Enter")$("#lgBtn").click()});
+$("#digestBtn").onclick=async()=>{const b=$("#digestBtn");b.textContent="Sending…";b.disabled=true;
+  try{const r=await api("digest",{method:"POST",body:"{}"});b.textContent="Sent to "+r.to;}
+  catch(e){b.textContent="Email me the digest";alert("Couldn't send: "+e.message);}
+  finally{setTimeout(()=>{b.textContent="Email me the digest";b.disabled=false;},6000);}};
 $("#logoutBtn").onclick=()=>{ls.del("bd-me");location.reload();};
 
 async function loadTeam(){
@@ -211,8 +216,8 @@ async function loadTeam(){
   news = (await api("news")).news||{};
   if(Object.keys(news).length < 5) api("refresh",{method:"POST",body:"{}"}).then(r=>{news=r.news||news;render();}).catch(()=>{});
   $("#modeLine").textContent = "Team dashboard · signed in as "+me.name+" · contacts researched "+SNAPSHOT;
-  $("#banner").innerHTML = `<span>Everyone's updates sync within about 20 seconds.</span>`;
-  $("#logoutBtn").classList.remove("hidden");
+  $("#banner").innerHTML = `<span>100 South African SMEs, 20 per sector. Everyone's updates sync within about 20 seconds. A digest of follow-ups, news signals and team updates goes to Gmail at 07:00 on weekdays.</span>`;
+  $("#logoutBtn").classList.remove("hidden"); $("#digestBtn").classList.remove("hidden");
 }
 async function poll(){
   if(MODE!=="team") return;
@@ -251,7 +256,7 @@ function filtered(){
     if(fd && !isDue(s)) return false;
     const fg=$("#fSig").value;
     if(fg){ const recent=newsFor(c).filter(n=>days(n.date)<=30); if(fg==="any"? !recent.some(n=>n.tags.some(t=>t!=="Tech")) : !recent.some(n=>n.tags.includes(fg))) return false; }
-    if(q){ const hay=[c.company,c.segment,c.role,c.contact,c.title,c.intel,s.notes,s.owner].join(" ").toLowerCase(); if(!hay.includes(q)) return false; }
+    if(q){ const hay=[c.company,c.segment,c.city,c.role,c.contact,c.title,c.intel,s.notes,s.owner].join(" ").toLowerCase(); if(!hay.includes(q)) return false; }
     return true;
   });
 }
@@ -295,7 +300,7 @@ function renderList(){
     return `<div class="card ${isDue(s)?"due":""}">
       <div>
         ${tab==="All"?`<div class="sec">${esc(c.sector)}</div>`:""}
-        <div class="co">${esc(c.company)}<span class="seg">${esc(c.segment)}</span></div>
+        <div class="co">${esc(c.company)}<span class="seg">${esc(c.segment)}${c.city?" · "+esc(c.city):""}${c.size?" · "+esc(c.size)+" staff":""}</span></div>
         ${who}
         ${c.intel?`<div class="intel">${esc(c.intel)}</div>`:""}
         ${newsBlock(c)}
@@ -353,9 +358,9 @@ function renderFeed(){
 // ---------- export / backup ----------
 function download(name, text, type){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000); }
 $("#exportBtn").onclick=()=>{
-  const cols=["Sector","Company","Segment","Target role","Contact","Contact title","Confidence","Status","Owner","Follow-up","Notes","Intel","Source","Latest news","News date"];
+  const cols=["Sector","Company","City","Size","Segment","Target role","Contact","Contact title","Confidence","Status","Owner","Follow-up","Notes","Intel","Source","Latest news","News date"];
   const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
-  const rows=filtered().map(c=>{const s=state[c.id]||{};return [c.sector,c.company,c.segment,c.role,c.contact,c.title,CONF[c.conf],s.status||"Not started",s.owner,s.follow,s.notes,c.intel,c.source,(newsFor(c)[0]||{}).title,(newsFor(c)[0]||{}).date].map(q).join(",");});
+  const rows=filtered().map(c=>{const s=state[c.id]||{};return [c.sector,c.company,c.city,c.size,c.segment,c.role,c.contact,c.title,CONF[c.conf],s.status||"Not started",s.owner,s.follow,s.notes,c.intel,c.source,(newsFor(c)[0]||{}).title,(newsFor(c)[0]||{}).date].map(q).join(",");});
   download(`Salt-BD-${tab.replace(/\W+/g,"-")}-${today()}.csv`, "\ufeff"+cols.join(",")+"\n"+rows.join("\n"), "text/csv");
 };
 $("#backupBtn").onclick=()=>download(`Salt-BD-backup-${today()}.json`, JSON.stringify({version:1,saved:new Date().toISOString(),state,log},null,1), "application/json");
