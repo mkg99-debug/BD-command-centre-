@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Salt BD Command Centre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f7f9;--panel:#ffffff;--ink:#14212b;--muted:#5b6b78;--line:#e2e8ee;
+  --navy:#0f2a3d;--teal:#0e8f8a;--teal-soft:#e3f4f3;--amber:#b7791f;--amber-soft:#fdf3e1;
+  --red:#c2413b;--red-soft:#fbe9e8;--green:#2f8a4c;--green-soft:#e6f4ea;--grey-soft:#eef1f4;
+  --shadow:0 1px 2px rgba(15,42,61,.06),0 4px 16px rgba(15,42,61,.05);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d151c;--panel:#141f29;--ink:#e6edf2;--muted:#93a4b2;--line:#233340;
+  --navy:#0a1720;--teal:#3cc2bb;--teal-soft:#123433;--amber:#e3a94d;--amber-soft:#33281a;
+  --red:#ef7a73;--red-soft:#3a1f1f;--green:#5fc27f;--green-soft:#173222;--grey-soft:#1c2a35;
+}}
+:root[data-theme="dark"]{
+  --bg:#0d151c;--panel:#141f29;--ink:#e6edf2;--muted:#93a4b2;--line:#233340;
+  --navy:#0a1720;--teal:#3cc2bb;--teal-soft:#123433;--amber:#e3a94d;--amber-soft:#33281a;
+  --red:#ef7a73;--red-soft:#3a1f1f;--green:#5fc27f;--green-soft:#173222;--grey-soft:#1c2a35;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui,sans-serif}
+a{color:var(--teal)}
+header{background:var(--navy);color:#fff;padding:18px 24px}
+.hwrap{max-width:1400px;margin:0 auto;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+h1{font-size:19px;margin:0;font-weight:700;letter-spacing:-.01em}
+h1 span{color:#7fd6d1;font-weight:500}
+.sub{font-size:12px;color:#b7c7d3;margin-top:2px}
+.hbtns{display:flex;gap:8px;flex-wrap:wrap}
+button,.btn{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+header button{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);color:#fff}
+header button:hover{background:rgba(255,255,255,.16)}
+button.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+main{max-width:1400px;margin:0 auto;padding:18px 16px 60px}
+.banner{background:var(--teal-soft);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tab{border-radius:999px;padding:7px 14px;border:1px solid var(--line);background:var(--panel);cursor:pointer;font-weight:500}
+.tab.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.tab .n{opacity:.65;margin-left:4px;font-weight:400}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;box-shadow:var(--shadow)}
+.stat b{display:block;font-size:20px}
+.stat small{color:var(--muted)}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
+.tools input,.tools select{font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink)}
+.tools input[type=search]{flex:1;min-width:180px}
+.grid{display:grid;grid-template-columns:1fr 300px;gap:14px}
+@media (max-width:1000px){.grid{grid-template-columns:1fr}}
+.list{display:flex;flex-direction:column;gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow);display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px}
+@media (max-width:760px){.card{grid-template-columns:1fr}}
+.card.due{border-left:4px solid var(--red)}
+.co{font-weight:700;font-size:15px}
+.seg{color:var(--muted);font-size:12px;margin-left:6px;font-weight:400}
+.sec{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--teal);font-weight:600}
+.who{margin-top:6px}
+.who .name{font-weight:600}
+.who .ttl{color:var(--muted)}
+.tbc{color:var(--amber);font-weight:500}
+.badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;margin-left:6px;white-space:nowrap}
+.bH{background:var(--green-soft);color:var(--green)}
+.bM{background:var(--teal-soft);color:var(--teal)}
+.bL{background:var(--amber-soft);color:var(--amber)}
+.bT{background:var(--grey-soft);color:var(--muted)}
+.intel{margin-top:6px;font-size:13px}
+.links{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+.links a{font-size:12px;border:1px solid var(--line);border-radius:6px;padding:3px 8px;text-decoration:none}
+.edit{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:start}
+.edit label{font-size:11px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+.edit select,.edit input,.edit textarea{font:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--ink);width:100%}
+.edit textarea{min-height:54px;resize:vertical}
+.edit .full{grid-column:1/-1}
+.by{grid-column:1/-1;font-size:11px;color:var(--muted)}
+aside .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow);position:sticky;top:12px}
+aside h3{margin:0 0 8px;font-size:14px}
+.feed{list-style:none;margin:0;padding:0;font-size:12px;max-height:60vh;overflow:auto}
+.feed li{padding:7px 0;border-bottom:1px solid var(--line)}
+.feed time{color:var(--muted);display:block}
+.empty{color:var(--muted);padding:30px;text-align:center}
+#login{max-width:380px;margin:60px auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;box-shadow:var(--shadow)}
+#login input{width:100%;font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:8px;margin:6px 0 12px;background:var(--bg);color:var(--ink)}
+#login .err{color:var(--red);font-size:13px;min-height:18px}
+.legend{font-size:12px;color:var(--muted);margin-bottom:10px}
+.hidden{display:none!important}
+.news{margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
+.news h4{margin:0 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;display:flex;justify-content:space-between;gap:8px}
+.news h4 button{font-size:11px;padding:1px 7px;border-radius:6px}
+.news ul{list-style:none;margin:0;padding:0}
+.news li{font-size:12.5px;padding:3px 0}
+.news li a{color:var(--ink);text-decoration:none}.news li a:hover{text-decoration:underline}
+.news .meta{color:var(--muted);font-size:11px}
+.chip{font-size:10px;font-weight:600;padding:1px 6px;border-radius:5px;margin-left:4px}
+.cFunding{background:var(--green-soft);color:var(--green)}.cLeadership{background:var(--red-soft);color:var(--red)}
+.cHiring{background:var(--teal-soft);color:var(--teal)}.cTech{background:var(--grey-soft);color:var(--muted)}
+.alert{margin-top:6px;font-size:12px;background:var(--red-soft);color:var(--red);border-radius:6px;padding:4px 8px;display:inline-block}
+.sig li{cursor:pointer}
+aside .panel+.panel{margin-top:12px;position:static}
+</style>
+</head>
+<body>
+<header><div class="hwrap">
+  <div><h1>Salt BD Command Centre <span>· SA</span></h1><div class="sub" id="modeLine"></div></div>
+  <div class="hbtns">
+    <button id="exportBtn">Export BD list</button>
+    <button id="backupBtn">Back up my updates</button>
+    <button id="restoreBtn">Restore a backup</button>
+    <button id="themeBtn" aria-label="Toggle theme">◐</button>
+    <button id="logoutBtn" class="hidden">Sign out</button>
+  </div>
+</div></header>
+
+<div id="login" class="hidden">
+  <h2 style="margin:0 0 4px;font-size:18px">Team sign-in</h2>
+  <p style="margin:0 0 14px;color:var(--muted);font-size:13px">Enter your name and the team password. Your browser remembers you after this.</p>
+  <label>Your name<input id="lgName" autocomplete="name"></label>
+  <label>Team password<input id="lgPw" type="password" autocomplete="current-password"></label>
+  <div class="err" id="lgErr"></div>
+  <button class="primary" id="lgBtn" style="width:100%;justify-content:center">Sign in</button>
+</div>
+
+<main id="app" class="hidden">
+  <div class="banner" id="banner"></div>
+  <div class="tabs" id="tabs"></div>
+  <div class="stats" id="stats"></div>
+  <div class="tools">
+    <input type="search" id="q" placeholder="Search company, person, role, notes…">
+    <select id="fStatus"><option value="">All statuses</option></select>
+    <select id="fConf"><option value="">All contacts</option><option value="named">Named contact</option><option value="T">Name to confirm</option></select>
+    <select id="fOwner"><option value="">All owners</option></select>
+    <select id="fSig"><option value="">All news</option><option value="any">Any signal (30d)</option><option>Funding</option><option>Leadership</option><option>Hiring</option></select>
+    <label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" id="fDue"> Follow-ups due</label>
+  </div>
+  <div class="legend">Contact confidence: <span class="badge bH">Confirmed 2026</span> <span class="badge bM">Confirmed, older</span> <span class="badge bL">Verify first</span> <span class="badge bT">Name to confirm</span></div>
+  <div class="grid">
+    <div class="list" id="list"></div>
+    <aside><div class="panel" id="sigPanel"><h3>Live signals · last 14 days</h3><div class="meta" id="sigMeta" style="font-size:11px;color:var(--muted);margin-bottom:6px"></div><ul class="feed sig" id="sigs"></ul></div><div class="panel"><h3 id="feedTitle">Recent updates</h3><ul class="feed" id="feed"></ul></div></aside>
+  </div>
+</main>
+<input type="file" id="restoreFile" accept="application/json" class="hidden">
+
+<script>
+const MODE = "team";            // "team" (Netlify) or "local"
+const EMBED = null;             // companies in local mode, null in team mode
+const SNAPSHOT = "19 Oct 2026";
+const STATUSES = ["Not started","Researching","Contacted","In conversation","Meeting booked","Brief received","Client","Not now"];
+const SECTORS = ["Software","Data & AI","Infrastructure","SAP","Product & Projects"];
+const CONF = {H:"Confirmed 2026",M:"Confirmed, older",L:"Verify first",T:"Name to confirm"};
+let companies = [], state = {}, log = [], news = {}, tab = "Software";
+const baseName = c => c.replace(/\s*\(.*?\)\s*/g," ").replace(/\s+/g," ").trim();
+const newsFor = c => (news[baseName(c.company)]||{}).items||[];
+const days = d => d ? (Date.now()-new Date(d))/864e5 : 999;
+const ago = d => { const n=days(d); return n<1/24?"just now":n<1?Math.round(n*24)+"h ago":Math.round(n)+"d ago"; };
+let me = {name:"", pw:""};
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ls = {
+  get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},
+  del(k){try{localStorage.removeItem(k)}catch(e){}}
+};
+const today = () => new Date().toISOString().slice(0,10);
+const isDue = s => s && s.follow && s.follow <= today() && !["Client","Not now"].includes(s.status);
+
+// ---------- theme ----------
+(function(){const t=ls.get("bd-theme",null);if(t)document.documentElement.dataset.theme=t;})();
+$("#themeBtn").onclick=()=>{const cur=document.documentElement.dataset.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");const n=cur==="dark"?"light":"dark";document.documentElement.dataset.theme=n;ls.set("bd-theme",n);};
+
+// ---------- api ----------
+async function api(op, opts={}){
+  const r = await fetch("/api/"+op, {...opts, headers:{"content-type":"application/json","x-team-password":me.pw,"x-user":encodeURIComponent(me.name),...(opts.headers||{})}});
+  if(r.status===401) throw new Error("auth");
+  if(!r.ok) throw new Error((await r.json().catch(()=>({}))).error || ("HTTP "+r.status));
+  return r.json();
+}
+
+async function boot(){
+  STATUSES.forEach(s=>$("#fStatus").insertAdjacentHTML("beforeend",`<option>${s}</option>`));
+  if(MODE==="local"){
+    companies = EMBED; state = ls.get("bd-state",{}); log = ls.get("bd-log",[]);
+    me.name = "Me"; $("#fSig").classList.add("hidden");
+    $("#modeLine").textContent = "Saved on this computer · contacts researched "+SNAPSHOT;
+    $("#banner").innerHTML = `<span>This is your own copy. Updates save automatically on this computer. Back up weekly so you can move them to another browser.</span>`;
+    start();
+  } else {
+    $("#backupBtn").textContent="Download team backup"; $("#restoreBtn").classList.add("hidden");
+    const saved = ls.get("bd-me",null);
+    if(saved){ me = saved; try{ await loadTeam(); start(); return; }catch(e){ ls.del("bd-me"); } }
+    $("#login").classList.remove("hidden");
+  }
+}
+$("#lgBtn").onclick = async ()=>{
+  me = {name:$("#lgName").value.trim(), pw:$("#lgPw").value};
+  if(!me.name){$("#lgErr").textContent="Add your name so the team sees who updated what.";return;}
+  $("#lgErr").textContent="Checking…";
+  try{ await loadTeam(); ls.set("bd-me",me); $("#login").classList.add("hidden"); start(); }
+  catch(e){ $("#lgErr").textContent = e.message==="auth" ? "That password isn't right." : "Couldn't reach the server: "+e.message; }
+};
+$("#lgPw").addEventListener("keydown",e=>{if(e.key==="Enter")$("#lgBtn").click()});
+$("#logoutBtn").onclick=()=>{ls.del("bd-me");location.reload();};
+
+async function loadTeam(){
+  const d = await api("data"); companies = d.companies;
+  const s = await api("state"); state = s.state||{}; log = s.log||[];
+  news = (await api("news")).news||{};
+  if(Object.keys(news).length < 5) api("refresh",{method:"POST",body:"{}"}).then(r=>{news=r.news||news;render();}).catch(()=>{});
+  $("#modeLine").textContent = "Team dashboard · signed in as "+me.name+" · contacts researched "+SNAPSHOT;
+  $("#banner").innerHTML = `<span>Everyone's updates sync within about 20 seconds.</span>`;
+  $("#logoutBtn").classList.remove("hidden");
+}
+async function poll(){
+  if(MODE!=="team") return;
+  try{ const s = await api("state"); const changed = JSON.stringify(s.state)!==JSON.stringify(state); state=s.state||{}; log=s.log||[]; try{ const nn=(await api("news")).news||{}; if(JSON.stringify(nn)!==JSON.stringify(news)){ news=nn; if(!changed) renderSignals(); } }catch(_){} if(changed && !document.activeElement.closest?.(".edit")) render(); else renderFeed(); }catch(e){}
+}
+
+function start(){ $("#app").classList.remove("hidden"); render(); if(MODE==="team") setInterval(poll,20000); }
+
+// ---------- saving ----------
+const timers = {};
+function save(id, field, value){
+  const cur = state[id] = {...(state[id]||{}), [field]:value, by:me.name, at:new Date().toISOString()};
+  const c = companies.find(x=>x.id===id);
+  if(MODE==="local"){
+    ls.set("bd-state",state);
+    if(field!=="notes"){ log.unshift({at:cur.at,user:me.name,company:c.company,sector:c.sector,what:({status:"Status",owner:"Owner",follow:"Follow-up"}[field]||field)+" → "+(value||"cleared")}); log=log.slice(0,50); ls.set("bd-log",log); }
+    renderFeed(); renderStats(); return;
+  }
+  clearTimeout(timers[id+field]);
+  timers[id+field] = setTimeout(async ()=>{
+    try{ const r = await api("state",{method:"POST",body:JSON.stringify({id,patch:{[field]:value},company:c.company,sector:c.sector})}); state[id]=r.item; log=r.log||log; renderFeed(); renderStats(); }
+    catch(e){ alert("Didn't save: "+e.message); }
+  }, field==="notes"?700:0);
+}
+
+// ---------- render ----------
+function filtered(){
+  const q=$("#q").value.toLowerCase(), fs=$("#fStatus").value, fc=$("#fConf").value, fo=$("#fOwner").value, fd=$("#fDue").checked;
+  return companies.filter(c=>{
+    if(tab!=="All" && c.sector!==tab) return false;
+    const s=state[c.id]||{};
+    if(fs && (s.status||"Not started")!==fs) return false;
+    if(fc==="T" && c.conf!=="T") return false;
+    if(fc==="named" && c.conf==="T") return false;
+    if(fo && (s.owner||"")!==fo) return false;
+    if(fd && !isDue(s)) return false;
+    const fg=$("#fSig").value;
+    if(fg){ const recent=newsFor(c).filter(n=>days(n.date)<=30); if(fg==="any"? !recent.some(n=>n.tags.some(t=>t!=="Tech")) : !recent.some(n=>n.tags.includes(fg))) return false; }
+    if(q){ const hay=[c.company,c.segment,c.role,c.contact,c.title,c.intel,s.notes,s.owner].join(" ").toLowerCase(); if(!hay.includes(q)) return false; }
+    return true;
+  });
+}
+function render(){ renderTabs(); renderStats(); renderOwners(); renderList(); renderFeed(); renderSignals(); }
+function renderTabs(){
+  const all=["All",...SECTORS];
+  $("#tabs").innerHTML = all.map(t=>`<button class="tab ${t===tab?"on":""}" data-t="${esc(t)}">${esc(t)}<span class="n">${t==="All"?companies.length:companies.filter(c=>c.sector===t).length}</span></button>`).join("");
+  $("#tabs").querySelectorAll(".tab").forEach(b=>b.onclick=()=>{tab=b.dataset.t;render();});
+}
+function renderStats(){
+  const pool = companies.filter(c=>tab==="All"||c.sector===tab);
+  const st = id => (state[id]||{}).status||"Not started";
+  const n = f => pool.filter(f).length;
+  const cards = [
+    ["Companies", pool.length],
+    ["Named contacts", n(c=>c.conf!=="T")],
+    ["Contacted+", n(c=>!["Not started","Researching","Not now"].includes(st(c.id)))],
+    ["Meetings", n(c=>["Meeting booked","Brief received","Client"].includes(st(c.id)))],
+    ["Clients", n(c=>st(c.id)==="Client")],
+    ["Follow-ups due", n(c=>isDue(state[c.id]))],
+  ];
+  $("#stats").innerHTML = cards.map(([l,v])=>`<div class="stat"><b>${v}</b><small>${l}</small></div>`).join("");
+}
+function renderOwners(){
+  const owners=[...new Set(Object.values(state).map(s=>s.owner).filter(Boolean))].sort();
+  const cur=$("#fOwner").value;
+  $("#fOwner").innerHTML = `<option value="">All owners</option>`+owners.map(o=>`<option ${o===cur?"selected":""}>${esc(o)}</option>`).join("");
+}
+function li(c){
+  const kw = c.conf==="T" ? `${c.role} ${c.company}` : `${c.contact} ${c.company}`;
+  return "https://www.linkedin.com/search/results/people/?keywords="+encodeURIComponent(kw);
+}
+function renderList(){
+  const rows = filtered();
+  if(!rows.length){ $("#list").innerHTML = `<div class="empty">Nothing matches those filters.</div>`; return; }
+  $("#list").innerHTML = rows.map(c=>{
+    const s = state[c.id]||{};
+    const who = c.conf==="T"
+      ? `<div class="who"><span class="tbc">Target: ${esc(c.role)}</span><span class="badge bT">${CONF.T}</span></div>`
+      : `<div class="who"><span class="name">${esc(c.contact)}</span> <span class="ttl">· ${esc(c.title)}</span><span class="badge b${c.conf}">${CONF[c.conf]}</span><div class="ttl" style="font-size:12px">Target role: ${esc(c.role)}</div></div>`;
+    return `<div class="card ${isDue(s)?"due":""}">
+      <div>
+        ${tab==="All"?`<div class="sec">${esc(c.sector)}</div>`:""}
+        <div class="co">${esc(c.company)}<span class="seg">${esc(c.segment)}</span></div>
+        ${who}
+        ${c.intel?`<div class="intel">${esc(c.intel)}</div>`:""}
+        ${newsBlock(c)}
+        <div class="links">
+          <a href="https://news.google.com/search?q=${encodeURIComponent('"'+c.company.replace(/\s*\(.*\)/,"")+'" South Africa')}&hl=en-ZA&gl=ZA&ceid=ZA:en" target="_blank" rel="noopener">Latest news</a>
+          <a href="${li(c)}" target="_blank" rel="noopener">${c.conf==="T"?"Find on LinkedIn":"LinkedIn"}</a>
+          ${c.source?`<a href="${esc(c.source)}" target="_blank" rel="noopener">Source</a>`:""}
+        </div>
+      </div>
+      <div class="edit" data-id="${c.id}">
+        <label>Status<select data-f="status">${STATUSES.map(x=>`<option ${x===(s.status||"Not started")?"selected":""}>${x}</option>`).join("")}</select></label>
+        <label>Owner<input data-f="owner" value="${esc(s.owner||"")}" placeholder="Who's on it"></label>
+        <label class="full">Follow-up<input type="date" data-f="follow" value="${esc(s.follow||"")}"></label>
+        <label class="full">Notes<textarea data-f="notes" placeholder="Call notes, mandate intel, next step">${esc(s.notes||"")}</textarea></label>
+        ${s.by?`<div class="by">Last updated by ${esc(s.by)} · ${new Date(s.at).toLocaleString("en-ZA",{dateStyle:"medium",timeStyle:"short"})}</div>`:""}
+      </div>
+    </div>`;
+  }).join("");
+  $("#list").querySelectorAll(".edit [data-f]").forEach(el=>{
+    const id = el.closest(".edit").dataset.id, f = el.dataset.f;
+    el.addEventListener(el.tagName==="TEXTAREA"||f==="owner"?"input":"change", ()=>{ save(id,f,el.value); if(f==="status"||f==="follow"){ el.closest(".card").classList.toggle("due",isDue(state[id])); } });
+    if(f==="owner") el.addEventListener("change",renderOwners);
+  });
+}
+function newsBlock(c){
+  if(MODE!=="team") return "";
+  const n=news[baseName(c.company)], items=(n&&n.items)||[];
+  const lead=items.find(i=>i.tags.includes("Leadership")&&days(i.date)<=60);
+  const head=`<h4><span>Live news ${n?"· checked "+ago(n.at):"· not scanned yet"}</span><button data-refresh="${c.id}">Refresh</button></h4>`;
+  return `${lead&&c.conf!=="T"?`<div class="alert">Leadership news in the last 60 days. Check ${esc(c.contact)} is still in seat.</div>`:""}
+  <div class="news">${head}${items.length?`<ul>${items.slice(0,3).map(i=>`<li><a href="${esc(i.link)}" target="_blank" rel="noopener">${esc(i.title)}</a>${i.tags.filter(t=>t!=="Tech").map(t=>`<span class="chip c${t}">${t}</span>`).join("")}<div class="meta">${esc(i.source)} · ${i.date?ago(i.date):""}</div></li>`).join("")}</ul>`:`<div class="meta">${n?"No SA news in the last 60 days.":"Scanning shortly."}</div>`}</div>`;
+}
+function renderSignals(){
+  const p=$("#sigPanel"); if(MODE!=="team"){p.classList.add("hidden");return;}
+  const seen=new Set(), out=[];
+  Object.entries(news).forEach(([name,n])=>(n.items||[]).forEach(i=>{ if(days(i.date)>14) return; const t=i.tags.filter(x=>x!=="Tech"); if(!t.length||seen.has(i.title)) return; seen.add(i.title); out.push({name,...i,t}); }));
+  out.sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  const scanned=Object.values(news).map(n=>n.at).sort().pop();
+  $("#sigMeta").textContent = Object.keys(news).length+" companies scanned"+(scanned?" · latest "+ago(scanned):"")+" · auto-refreshes hourly";
+  $("#sigs").innerHTML = out.length? out.slice(0,30).map(i=>`<li data-co="${esc(i.name)}"><b>${esc(i.name)}</b>${i.t.map(t=>`<span class="chip c${t}">${t}</span>`).join("")}<br><a href="${esc(i.link)}" target="_blank" rel="noopener" style="color:var(--ink)">${esc(i.title)}</a><time>${esc(i.source)} · ${ago(i.date)}</time></li>`).join("") : `<li style="color:var(--muted)">No funding, leadership or hiring news in the last 14 days yet.</li>`;
+  $("#sigs").querySelectorAll("li[data-co]").forEach(li=>li.querySelector("b").onclick=()=>{tab="All";$("#q").value=li.dataset.co;render();});
+}
+document.addEventListener("click",async e=>{
+  const b=e.target.closest("[data-refresh]"); if(!b) return;
+  b.textContent="Checking…"; b.disabled=true;
+  try{ const r=await api("refresh",{method:"POST",body:JSON.stringify({id:b.dataset.refresh})}); news=r.news||news; renderList(); renderSignals(); }
+  catch(err){ b.textContent="Failed"; }
+});
+function renderFeed(){
+  $("#feedTitle").textContent = MODE==="team"?"Recent team updates":"Recent updates";
+  $("#feed").innerHTML = log.length ? log.slice(0,25).map(l=>`<li><b>${esc(l.user)}</b> · ${esc(l.company)} <span style="color:var(--muted)">(${esc(l.sector)})</span><br>${esc(l.what)}<time>${new Date(l.at).toLocaleString("en-ZA",{dateStyle:"medium",timeStyle:"short"})}</time></li>`).join("") : `<li style="color:var(--muted)">No updates yet.</li>`;
+}
+["#q","#fStatus","#fConf","#fOwner","#fDue","#fSig"].forEach(s=>$(s).addEventListener("input",renderList));
+
+// ---------- export / backup ----------
+function download(name, text, type){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000); }
+$("#exportBtn").onclick=()=>{
+  const cols=["Sector","Company","Segment","Target role","Contact","Contact title","Confidence","Status","Owner","Follow-up","Notes","Intel","Source","Latest news","News date"];
+  const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+  const rows=filtered().map(c=>{const s=state[c.id]||{};return [c.sector,c.company,c.segment,c.role,c.contact,c.title,CONF[c.conf],s.status||"Not started",s.owner,s.follow,s.notes,c.intel,c.source,(newsFor(c)[0]||{}).title,(newsFor(c)[0]||{}).date].map(q).join(",");});
+  download(`Salt-BD-${tab.replace(/\W+/g,"-")}-${today()}.csv`, "\ufeff"+cols.join(",")+"\n"+rows.join("\n"), "text/csv");
+};
+$("#backupBtn").onclick=()=>download(`Salt-BD-backup-${today()}.json`, JSON.stringify({version:1,saved:new Date().toISOString(),state,log},null,1), "application/json");
+$("#restoreBtn").onclick=()=>$("#restoreFile").click();
+$("#restoreFile").onchange=async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  try{ const d=JSON.parse(await f.text()); if(!d.state) throw 0; state=d.state; log=d.log||[]; ls.set("bd-state",state); ls.set("bd-log",log); render(); alert("Backup restored."); }
+  catch(_){ alert("That file isn't a BD Command Centre backup."); }
+};
+boot();
+</script>
+</body>
+</html>
